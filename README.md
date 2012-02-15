@@ -19,7 +19,7 @@ You must install the following gems:
 * redcarpet
 * json
 
-Additionally, you must install pygments if you wish to use the
+Additionally, you must install pygments.rb if you wish to use the
 syntax hilighting features.
 
 ## Usage
