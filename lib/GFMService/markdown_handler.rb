@@ -1,22 +1,56 @@
 module GFMService
   class MarkdownHandler < Mongrel::HttpHandler
-    def process(request, response)
 
-      # So, this is exception handling in Ruby aparently.
+    MSG_FAILED_TO_RENDER_MDOWN = {
+        "status" => "0",
+        "error_message" => "Failed to render markdown."
+    }
+    MSG_FAILED_TO_DECODE_JSON = JSON.generate({
+        "response" =>
+            {"status" => 0,
+             "error_message" => "Failed to decode JSON"
+            }
+    })
+    MSG_FAILED_TO_ENCODE_JSON = JSON.generate({
+        "response" => {
+            "status" => "0",
+            "error_message" => "Failed to encode JSON."
+        }
+    })
+
+    def process(request, response)
+      input = JSON.parse(request.body.string)
+      markdown = my_custom_markdown(input)
+
       begin
-        input = JSON.parse(request.body.string)
+        content = {"status" => "1",
+                   "document" => markdown.render(input['document'])
+        }
       rescue
-        response.start(500, true) do |header, body|
-          header['Content-Type'] = "application/json"
-          body << JSON.generate({"response" =>
-                                     { "status" => 0,
-                                       "error_message" => "Failed to decode JSON"
-                                     }
-                                })
-        end
+        content = MSG_FAILED_TO_RENDER_MDOWN
       end
 
-      markdown = Redcarpet::Markdown.new(
+      output = JSON.generate({'request' => input, 'response' => content})
+      send_back(response, 200, output)
+
+    rescue JSON::ParserError => e
+      send_back(response, 500, MSG_FAILED_TO_DECODE_JSON)
+    rescue JSON::GenerateError => e
+      send_back(response, 200, MSG_FAILED_TO_ENCODE_JSON)
+
+    end
+
+    #private
+
+    def send_back(response, response_code, message)
+      response.start(response_code, true) do |header, body|
+        header['Content-Type'] = "application/json"
+        body << message
+      end
+    end
+
+    def my_custom_markdown input
+      Redcarpet::Markdown.new(
           HtmlWithAlbino,
           :no_intra_emphasis => input['no_intra_emphasis'] ? true : false,
           :tables => input['tables'] ? true : false,
@@ -27,39 +61,8 @@ module GFMService
           :space_after_headers=> input['space_after_headers'] ? true : false,
           :superscript => input['superscript'] ? true : false
       )
-
-      begin
-        content = {
-            "status" => "1",
-            "document" => markdown.render(input['document'])
-        }
-      rescue
-        content = {
-            "status" => "0",
-            "error_message" => "Failed to render markdown."
-        }
-      end
-
-      to_json = {}
-      to_json['request'] = input
-      to_json['response'] = content
-
-      begin
-        output = JSON.generate(to_json)
-      rescue
-        output = JSON.generate({
-                                   "response" => {
-                                       "status" => "0",
-                                       "error_message" => "Failed to encode JSON."
-                                   }
-                               })
-      end
-
-      response.start(200, true) do |header, body|
-        header['Content-Type'] = "application/json"
-        body << output
-      end
     end
+
   end
 
 end
