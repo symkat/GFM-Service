@@ -14,7 +14,7 @@ languages other than Ruby.
 
 You must install the following gems:
 
-* mongrel
+* rack
 * albino
 * redcarpet
 * json
@@ -46,14 +46,8 @@ Default markup
 
     curl -d'{ "document" : "# Hello World" }' http://myserver.com:5000/
     {
-        "response" : {
-            "document" : "<h1>Hello World</h1>\n",
-            "status" : "1"
-        }, 
-        
-        "request" : {
-            "document" : "# Hello World"
-        }
+      "document" : "# Hello World"
+      "status" : "1"
     }
 
 With fenced_code_blocks
@@ -61,20 +55,14 @@ With fenced_code_blocks
     curl -d'{"document":"```ruby\nputs \"Hello World\"\n```","fenced_code_blocks":1}' \
         http://myserver.com:5000/
     {
-        "response" : {
-            "document" : "
-                <div class=\"highlight\">
-                    <pre>
-                        <span class=\"nb\">puts</span> 
-                        <span class=\"s2\">&quot;Hello World&quot;</span>\n
-                    </pre>\n
-                </div>\n",
-            "status" : "1"
-        },
-        "request" : {
-            "document" : "```ruby\nputs \"Hello World\"\n```",
-            "fenced_code_blocks" : 1
-        }
+        "document" : "
+            <div class=\"highlight\">
+                <pre>
+                    <span class=\"nb\">puts</span> 
+                    <span class=\"s2\">&quot;Hello World&quot;</span>\n
+                </pre>\n
+            </div>\n",
+        "status" : "1"
     }
 
 ### AUTHOR
