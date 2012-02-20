@@ -48,6 +48,10 @@ class GFMServer
       return fatal_error( "Invalid JSON Structure: #{input}" )
     end
 
+    if input['document'].length == 0
+        return fatal_error( "No content to markdown." ) 
+    end
+
     # Get the markdown class based on JSON options
     # used.  TODO: is there a way to memoize this?
     markdown = get_markdown_class(input)
