@@ -7,6 +7,9 @@ require 'json'
 
 class HTMLwithAlbino < Redcarpet::Render::HTML
     def block_code(code, language)
+        if language == nil
+            return code
+        end
         Albino.colorize(code, language)
     end
 end
@@ -56,7 +59,7 @@ class GFMServer
     # used.  TODO: is there a way to memoize this?
     markdown = get_markdown_class(input)
 
-    [ 200, { "Content-Type" => "application/json" },
+    [ 200, { "Content-Type" => "application/json; charset=UTF-8" },
       JSON.generate(
         "status" => 1,
         "document" => markdown.render( input['document'] )
