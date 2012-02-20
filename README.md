@@ -33,7 +33,7 @@ GFM-Service is JSON based and supports the following keys:
 * autolink
 * strikethrough
 * lax_html_blocks
-* space_after_headers=>
+* space_after_headers
 * superscript
 
 Document is the only required key, and should point to the document
