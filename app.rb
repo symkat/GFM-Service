@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require 'rubygems'
+#require 'rubygems'
 require 'rack'
 require 'redcarpet'
 require 'albino'
@@ -19,7 +19,7 @@ class GFMServer
     return [ 
       500, 
       { "Content-Type" => "application/json" },
-      "{ 'status' : 0, 'error' : '#{msg}' }"
+      [ "{ 'status' : 0, 'error' : '#{msg}' }" ]
     ]
   end
 
@@ -59,11 +59,18 @@ class GFMServer
     # used.  TODO: is there a way to memoize this?
     markdown = get_markdown_class(input)
 
-    [ 200, { "Content-Type" => "application/json; charset=UTF-8" },
-      JSON.generate(
-        "status" => 1,
-        "document" => markdown.render( input['document'] )
-      )
+    content = [
+    ]
+
+    return [ 
+      200, 
+      { "Content-Type" => "application/json; charset=UTF-8" },
+      [
+        JSON.generate(
+          "status" => 1,
+          "document" => markdown.render( input['document'] )
+        )
+      ]
     ]
   end
 end
